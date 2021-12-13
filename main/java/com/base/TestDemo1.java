@@ -14,7 +14,7 @@ public class TestDemo1 {
     volatile boolean flag = false;
     int a = 0;
 
-    private void add() {
+    synchronized private void add() {
         int id = 0;
         while (id++ < 10000) {
             count += 1;
@@ -39,7 +39,6 @@ public class TestDemo1 {
         } catch (InterruptedException e) {
             System.out.println(e);
         }
-
 
 
     }
