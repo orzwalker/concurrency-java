@@ -14,7 +14,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 public class RouteTable {
 
-    private ConcurrentMap<String, CopyOnWriteArraySet<Route>> routeTable = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, CopyOnWriteArraySet<Route>> routeTable = new ConcurrentHashMap<>();
 
     public void addRoute(Route route) {
         routeTable.computeIfAbsent(route.systemCode, v -> new CopyOnWriteArraySet<>()).add(route);

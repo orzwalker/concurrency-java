@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 实现烧水泡茶程序
+ * 两个有依赖关系的任务之间的通信协作
  *
  * @author walker
  * @since 2021/12/21 13:46
@@ -26,9 +27,7 @@ public class FutureTaskDemo {
         new Thread(ft2).start();
         try {
             System.out.println(ft1.get());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
     }
