@@ -71,7 +71,6 @@ public class BlockQueueWithMonitor {
                 }
             }).start();
         }
-//        System.out.println(Thread.currentThread().getName() + " -" + queue.dep());
         /**
          * Thread-0 入队元素:_0
          * Thread-4 入队元素:_4
