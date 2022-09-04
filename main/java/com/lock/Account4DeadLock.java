@@ -1,7 +1,9 @@
 package com.lock;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * 死锁的条件
@@ -111,7 +113,6 @@ class Allocator {
 
     /**
      * 一次性申请所有资源
-     * 问题：锁住了所有账户，成本太高了，不适用
      */
     synchronized public boolean reply(Object from, Object to) {
         while (list.contains(from) || list.contains(to)) {
@@ -141,6 +142,26 @@ class Allocator {
 
             // 释放互斥锁后，唤醒等待队列
             notifyAll();
+        }
+    }
+
+    Queue<String> queue = new LinkedList<>();
+    public void test(int n) throws InterruptedException {
+        synchronized (this) {
+           if (n > 0) {
+               // 如果条件满足
+               // 加锁
+               // 处理逻辑
+               System.out.println("开始处理当前任务");
+               // 处理完成后释放锁
+
+               // 并唤起等待任务
+               notifyAll();
+           } else {
+               // 条件不满足，进入等待队列
+               wait();
+
+           }
         }
     }
 }
