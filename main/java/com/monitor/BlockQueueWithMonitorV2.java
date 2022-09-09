@@ -1,7 +1,5 @@
 package com.monitor;
 
-import sun.tools.attach.HotSpotVirtualMachine;
-
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.locks.Condition;

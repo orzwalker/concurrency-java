@@ -141,6 +141,7 @@ class Allocator {
             list.remove(to);
 
             // 释放互斥锁后，唤醒等待队列
+            // 唤起等待队列中的所有任务，notify只能随机唤起一个任务
             notifyAll();
         }
     }
