@@ -14,6 +14,7 @@ public class PrintABSequenceV2 {
             while (flag) {
                 try {
                     // 释放锁资源
+                    // 这个线程下次到达等待队列时，先获取锁资源，然后执行wait之后的代码
                     lock.wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
