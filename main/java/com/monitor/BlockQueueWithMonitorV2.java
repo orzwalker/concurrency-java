@@ -36,8 +36,8 @@ public class BlockQueueWithMonitorV2 {
     final Condition queue_full = lock.newCondition();
 
 
-    private Integer CAPACITY;
-    private volatile Queue<String> queue = new LinkedList<>();
+    private final Integer CAPACITY;
+    private final Queue<String> queue = new LinkedList<>();
 
     public BlockQueueWithMonitorV2(int size) {
         if (size < 0) {
@@ -72,7 +72,7 @@ public class BlockQueueWithMonitorV2 {
     /**
      * 出队列
      */
-    synchronized public void dep() {
+    public void dep() {
         lock.lock();
         try {
             // 队列空
