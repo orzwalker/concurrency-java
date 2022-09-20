@@ -2,6 +2,8 @@ package com.semaphore;
 
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -28,8 +30,9 @@ public class RateLimiterBySemaphore<T, R> {
         SEMAPHORE.acquire();
         try {
             System.out.println("curr thread:" + Thread.currentThread().getName() +
-                    " permits=" + SEMAPHORE.availablePermits()
-                    + " queue length = " + SEMAPHORE.getQueueLength());
+                    " availablePermits=" + SEMAPHORE.availablePermits() +
+                    " drainPermits=" + SEMAPHORE.drainPermits() +
+                    " queue length = " + SEMAPHORE.getQueueLength());
             t = pool.remove(0);
             if (null != t) {
                 return function.apply(t);
@@ -42,21 +45,25 @@ public class RateLimiterBySemaphore<T, R> {
     }
 
     public static void main(String[] args) {
-        RateLimiterBySemaphore semaphore = new RateLimiterBySemaphore(3, "xxx");
+        ExecutorService pool = Executors.newFixedThreadPool(20);
+        RateLimiterBySemaphore semaphore = new RateLimiterBySemaphore(1, "xxx");
+
+        Runnable runnable = () -> {
+            try {
+                Thread.sleep(1000);
+
+                semaphore.execute(r -> r);
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        };
+
         for (int i = 0; i < 20; i++) {
-            new Thread(() -> {
-                try {
-                    semaphore.execute(r -> r);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }).start();
+            pool.submit(runnable);
         }
 
-        try {
-            TimeUnit.SECONDS.sleep(5);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        pool.shutdown();
+
     }
 }

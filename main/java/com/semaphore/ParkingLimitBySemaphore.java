@@ -1,5 +1,7 @@
 package com.semaphore;
 
+import com.sun.xml.internal.fastinfoset.tools.FI_SAX_Or_XML_SAX_SAXEvent;
+
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,24 +27,23 @@ public class ParkingLimitBySemaphore {
 
 
     public static void main(String[] args) {
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                String tName = Thread.currentThread().getName();
-                System.out.printf("车主:%s 停车场外排队, 时间:%s%n", tName, new Date());
-                try {
-                    // 让所有线程都等待
-                    Thread.sleep(1000);
+        Runnable runnable = () -> {
+            String tName = Thread.currentThread().getName();
+            System.out.printf("车主:%s 停车场外排队, 时间:%s%n", tName, new Date());
+            try {
+                // 让所有线程都等待
+                Thread.sleep(1000);
 
-                    semaphore.acquire();
-                    System.out.printf("车主:%s 已进入停车场, 时间:%s%n", tName, new Date());
-                    Thread.sleep(1000);
-                    System.out.printf("车主:%s 已离开停车场, 时间:%s%n", tName, new Date());
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } finally {
-                    semaphore.release();
-                }
+                semaphore.acquire();
+                // fixme 为什么availablePermits数量至少大于等于0？====可用的许可证最多有N个，最少就0个，不可能是负数？
+                 System.out.printf("车主:%s 已进入停车场, 时间:%s, permits:%s%n", tName, new Date(), semaphore.availablePermits());
+//                System.out.printf("%s acquire, available permits:%s%n", tName, semaphore.availablePermits());
+                Thread.sleep(1000);
+                 System.out.printf("车主:%s 已离开停车场, 时间:%s%n", tName, new Date());
+                semaphore.release();
+//                System.out.printf("%s release, available permits:%s%n", tName, semaphore.availablePermits());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         };
 
