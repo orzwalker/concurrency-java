@@ -38,7 +38,7 @@ public class ParkingLimitBySemaphore {
                 // fixme 为什么availablePermits数量至少大于等于0？====可用的许可证最多有N个，最少就0个，不可能是负数？
                  System.out.printf("车主:%s 已进入停车场, 时间:%s, permits:%s%n", tName, new Date(), semaphore.availablePermits());
 //                System.out.printf("%s acquire, available permits:%s%n", tName, semaphore.availablePermits());
-                Thread.sleep(1000);
+                Thread.sleep(200);
                  System.out.printf("车主:%s 已离开停车场, 时间:%s%n", tName, new Date());
                 semaphore.release();
 //                System.out.printf("%s release, available permits:%s%n", tName, semaphore.availablePermits());
