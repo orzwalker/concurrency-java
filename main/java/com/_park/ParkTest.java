@@ -1,16 +1,17 @@
 package com._park;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
 /**
  * park、unpark方法成对使用时，前后顺序没有严格限制
  */
 public class ParkTest {
-    public static void main(String[] args) {
-        test1();
-        System.out.println("\n");
-        test2();
-        System.out.println("\n");
+    public static void main(String[] args) throws InterruptedException {
+//        test1();
+//        System.out.println("\n");
+//        test2();
+//        System.out.println("\n");
         test3();
 
     }
@@ -83,7 +84,7 @@ public class ParkTest {
     }
 
 
-    public static void test3() {
+    public static void test3() throws InterruptedException {
         System.out.println("start");
         Thread thread = new Thread(() -> {
             Thread t = Thread.currentThread();
@@ -103,9 +104,12 @@ public class ParkTest {
         }, "t1");
 
         thread.start();
+        TimeUnit.SECONDS.sleep(3);
+        System.out.println("子线程状态："+ thread.getState().name());
+        System.out.println("主线程状态："+ Thread.currentThread().getState().name());
 
         /**
-         * 连续两次park，但是permit最大值是1
+         * 连续两次unpark，但是permit最大值是1
          * 所以后边两次park获取许可时，第二次失败，一直阻塞
          *
          * start
@@ -114,6 +118,8 @@ public class ParkTest {
          * park 1
          * stateName:RUNNABLE ordinal:1
          * park 2
+         * 子线程状态：WAITING
+         * 主线程状态：RUNNABLE
          */
     }
 
