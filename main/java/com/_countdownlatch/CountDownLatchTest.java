@@ -9,16 +9,20 @@ import java.util.concurrent.CountDownLatch;
 public class CountDownLatchTest {
 
     public static void main(String[] args) throws InterruptedException {
-        CountDownLatch countDownLatch = new CountDownLatch(7);
+        /*
+         * state的数量大于子线程数，并且使用await()方法，则会阻塞，主线程不会被唤起
+         */
+        int state = 3;
+        CountDownLatch countDownLatch = new CountDownLatch(state);
         Service service = new Service(countDownLatch);
         Runnable runnable = service::execute;
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < state; i++) {
             Thread thread = new Thread(runnable);
             thread.start();
         }
 
         System.out.println("main thread wait....");
-        // countDownLatch.await(2000, TimeUnit.MILLISECONDS);
+//        countDownLatch.await(3000, TimeUnit.MILLISECONDS);
         countDownLatch.await();
         System.out.println("main thread done...");
     }
