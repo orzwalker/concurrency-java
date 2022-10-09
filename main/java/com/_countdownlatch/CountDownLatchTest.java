@@ -11,6 +11,7 @@ public class CountDownLatchTest {
     public static void main(String[] args) throws InterruptedException {
         /*
          * state的数量大于子线程数，并且使用await()方法，则会阻塞，主线程不会被唤起
+         * state的数量小于子线程数，执行过程中，因为state=0然后唤起主线程，可能出现某些子线程任务还没有执行结束就执行主线程的情况
          */
         int state = 3;
         CountDownLatch countDownLatch = new CountDownLatch(state);
@@ -21,10 +22,10 @@ public class CountDownLatchTest {
             thread.start();
         }
 
-        System.out.println("main thread wait....");
+        System.out.println("main thread wait....count:" + countDownLatch.getCount());
 //        countDownLatch.await(3000, TimeUnit.MILLISECONDS);
         countDownLatch.await();
-        System.out.println("main thread done...");
+        System.out.println("main thread done...count:" + countDownLatch.getCount());
     }
 
     static class Service {
@@ -44,6 +45,8 @@ public class CountDownLatchTest {
                 e.printStackTrace();
             } finally {
                 countDownLatch.countDown();
+                // 当前state值
+                System.out.println("count:" + countDownLatch.getCount());
             }
         }
     }
