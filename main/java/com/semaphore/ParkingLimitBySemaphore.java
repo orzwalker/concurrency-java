@@ -36,6 +36,8 @@ public class ParkingLimitBySemaphore {
 
                 semaphore.acquire();
                 // fixme 为什么availablePermits数量至少大于等于0？====可用的许可证最多有N个，最少就0个，不可能是负数？
+                //  acquire执行时，state小减去N后小于0表示获取资源失败，但是不会更新state
+                //  只有减去后的值大于等于0时，才会执行CAS更新
                  System.out.printf("车主:%s 已进入停车场, 时间:%s, permits:%s%n", tName, new Date(), semaphore.availablePermits());
 //                System.out.printf("%s acquire, available permits:%s%n", tName, semaphore.availablePermits());
                 Thread.sleep(200);
