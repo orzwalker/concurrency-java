@@ -46,7 +46,7 @@ public class CountDownLatchTest {
             } finally {
                 countDownLatch.countDown();
                 // 当前state值
-                System.out.println("count:" + countDownLatch.getCount());
+                System.out.println("current count:" + countDownLatch.getCount());
             }
         }
     }
