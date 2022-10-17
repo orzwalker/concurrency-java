@@ -5,6 +5,8 @@ import java.util.concurrent.locks.LockSupport;
 
 /**
  * park、unpark方法成对使用时，前后顺序没有严格限制
+ * <p>
+ * park、unpark 如何响应中断
  */
 public class ParkTest {
     public static void main(String[] args) throws InterruptedException {
@@ -12,7 +14,9 @@ public class ParkTest {
 //        System.out.println("\n");
 //        test2();
 //        System.out.println("\n");
-        test3();
+//        test3();
+//        test4();
+        test5();
 
     }
 
@@ -26,11 +30,7 @@ public class ParkTest {
         thread.start();
 
         // 子线程阻塞2秒，后被主线程unpark唤起
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        _sleep(2);
         threadInfo(thread);
 
         System.out.println(Thread.currentThread().getName() + " start unpark");
@@ -54,11 +54,7 @@ public class ParkTest {
     public static void test2() {
         System.out.println("start");
         Thread thread = new Thread(() -> {
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            _sleep(2);
             System.out.println(Thread.currentThread().getName() + " start park");
             LockSupport.park();
             threadInfo(Thread.currentThread());
@@ -105,8 +101,8 @@ public class ParkTest {
 
         thread.start();
         TimeUnit.SECONDS.sleep(3);
-        System.out.println("子线程状态："+ thread.getState().name());
-        System.out.println("主线程状态："+ Thread.currentThread().getState().name());
+        System.out.println("子线程状态：" + thread.getState().name());
+        System.out.println("主线程状态：" + Thread.currentThread().getState().name());
 
         /**
          * 连续两次unpark，但是permit最大值是1
@@ -123,8 +119,49 @@ public class ParkTest {
          */
     }
 
+    public static void test4() {
+        Thread.currentThread().interrupt();
+        LockSupport.park();
+        System.out.println("1 先interrupt，后park");
+        // 程序正常执行结束，不阻塞====因为interrupt中会调用unpark方法
+
+        LockSupport.park();
+        System.out.println("2 先interrupt，后park");
+        LockSupport.park();
+        System.out.println("3 先interrupt，后park");
+        // 2、3也能正常执行，因为线程处于中断状态，park时直接返回
+
+    }
+
+    public static void test5() {
+        Thread main = Thread.currentThread();
+        Thread thread = new Thread(() -> {
+            System.out.println("子线程sleep 2s");
+            _sleep(2);
+            System.out.println("main线程是否中断: " + main.isInterrupted()); // false
+            System.out.println("main线程状态: " + main.getState().name()); // WAITING
+            System.out.println("中断main线程");
+            main.interrupt();
+            System.out.println("main线程是否中断: " + main.isInterrupted()); // true
+            _sleep(2);
+            System.out.println("main线程状态: " + main.getState().name()); // TERMINATED
+        });
+        thread.start();
+        LockSupport.park();
+    }
+
 
     private static void threadInfo(Thread thread) {
         System.out.println("stateName:" + thread.getState().name() + " ordinal:" + thread.getState().ordinal());
+    }
+
+    private static void _sleep(int time) {
+        if (time > 0) {
+            try {
+                TimeUnit.SECONDS.sleep(time);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
