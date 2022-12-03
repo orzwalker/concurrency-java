@@ -11,6 +11,8 @@ public class InterruptedTest {
     public static void main(String[] args) {
 
         Thread thread = new Thread(() -> {
+            // while (!Thread.currentThread().isInterrupted()) {
+
             // 第一次调用interrupted后，线程是中断状态，并清除中断标识
             // 也就是说第二次调用时，处于非中断状态
             while (!Thread.interrupted()) {
@@ -21,6 +23,8 @@ public class InterruptedTest {
                 try {
                     TimeUnit.SECONDS.sleep(2);
                 } catch (InterruptedException e) {
+                    // 抛出异常时，会清除中断标识
+                    // 如果要退出循环，应该重新设置中断标识
                     e.printStackTrace();
                 }
             }

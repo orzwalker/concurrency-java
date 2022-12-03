@@ -10,13 +10,13 @@ import java.util.concurrent.locks.LockSupport;
  */
 public class ParkTest {
     public static void main(String[] args) throws InterruptedException {
-//        test1();
+        test1();
 //        System.out.println("\n");
 //        test2();
 //        System.out.println("\n");
 //        test3();
 //        test4();
-        test5();
+//        test5();
 
     }
 
