@@ -17,53 +17,54 @@ import java.util.concurrent.Executors;
 public class ThreadLocalTest {
 
 
-    /*
-     * Thread-1:1
-     * Thread-3:3
+    /**
      * Thread-0:0
+     * Thread-1:1
      * Thread-2:2
+     * Thread-3:3
      * Thread-4:4
-     * parent:Thread-0:null
-     * parent:Thread-3:null
-     * parent:Thread-1:null
-     * parent:Thread-4:null
-     * parent:Thread-2:null
+     * parent:Thread-4:null, tomcat-thread:pool-1-thread-1
+     * parent:Thread-3:null, tomcat-thread:pool-1-thread-2
+     * parent:Thread-1:null, tomcat-thread:pool-1-thread-3
+     * parent:Thread-2:null, tomcat-thread:pool-1-thread-3
+     * parent:Thread-0:null, tomcat-thread:pool-1-thread-3
      */
 //    private static final ThreadLocal<Integer> TL = new ThreadLocal<>();
 
-    /*
-     * Thread-0:0
-     * Thread-3:3
+    /**
      * Thread-1:1
-     * Thread-2:2
      * Thread-4:4
-     * parent:Thread-3:3
-     * parent:Thread-4:3
-     * parent:Thread-0:3
-     * parent:Thread-1:1
-     * parent:Thread-2:2
+     * Thread-3:3
+     * Thread-2:2
+     * Thread-0:0
+     * parent:Thread-3:3, tomcat-thread:pool-1-thread-1
+     * parent:Thread-1:1, tomcat-thread:pool-1-thread-3
+     * parent:Thread-0:3, tomcat-thread:pool-1-thread-1
+     * parent:Thread-2:1, tomcat-thread:pool-1-thread-3
+     * parent:Thread-4:4, tomcat-thread:pool-1-thread-2
      */
 //    private static final ThreadLocal<Integer> TL = new InheritableThreadLocal<>();
 
-    /*
+    /**
      * Thread-1:0
-     * Thread-4:3
-     * Thread-5:4
-     * Thread-2:1
      * Thread-3:2
-     * parent:Thread-5:4
-     * parent:Thread-1:0
-     * parent:Thread-4:3
-     * parent:Thread-3:2
-     * parent:Thread-2:1
+     * Thread-5:4
+     * Thread-4:3
+     * Thread-2:1
+     * parent:Thread-2:1, tomcat-thread:pool-1-thread-3
+     * parent:Thread-4:3, tomcat-thread:pool-1-thread-1
+     * parent:Thread-1:0, tomcat-thread:pool-1-thread-3
+     * parent:Thread-5:4, tomcat-thread:pool-1-thread-2
+     * parent:Thread-3:2, tomcat-thread:pool-1-thread-1
      */
     private static final ThreadLocal<Integer> TL = new TransmittableThreadLocal<>();
 
     static ExecutorService threadPoolExecutor = Executors.newFixedThreadPool(3);
-    // 模拟Tomcat线程池
+    // 模拟Tomcat线程池--3个工作线程
     private static final ExecutorService threadPool = TtlExecutors.getTtlExecutorService(threadPoolExecutor);
 
     public static void main(String[] args) {
+        // 提交5个任务给Tomcat线程池
         for (int i = 0; i < 5; i++) {
             new TomcatThread(i).start();
         }
@@ -71,7 +72,7 @@ public class ThreadLocalTest {
 
 
     /**
-     * 父线程----提交任务的线程
+     * 父线程----提交任务让Tomcat执行的线程
      */
     static class TomcatThread extends Thread {
         private final int index;
@@ -95,7 +96,7 @@ public class ThreadLocalTest {
     }
 
     /**
-     * 业务任务
+     * tomcat通过线程池去执行业务任务
      */
     static class BusinessTask implements Runnable {
         private final String parentThreadName;
@@ -106,7 +107,7 @@ public class ThreadLocalTest {
 
         @Override
         public void run() {
-            System.out.println("parent:" + parentThreadName + ":" + TL.get());
+            System.out.println("parent:" + parentThreadName + ":" + TL.get() + ", tomcat-thread:" + Thread.currentThread().getName());
         }
     }
 
