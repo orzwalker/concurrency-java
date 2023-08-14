@@ -84,9 +84,9 @@ public class ParkTest {
         System.out.println("start");
         Thread thread = new Thread(() -> {
             Thread t = Thread.currentThread();
-            System.out.println("unpart 1");
+            System.out.println("unpark 1");
             LockSupport.unpark(t);
-            System.out.println("unpart 2");
+            System.out.println("unpark 2");
             LockSupport.unpark(t);
 
             System.out.println("park 1");
